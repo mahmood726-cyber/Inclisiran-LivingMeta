@@ -1665,7 +1665,7 @@
             return safe;
         };
 
-        const AUTO_INCLUDE_TRIAL_IDS = new Set(['NCT03397121', 'NCT03399370', 'NCT03400800', 'NCT03705234']);
+        const AUTO_INCLUDE_TRIAL_IDS = new Set(['NCT03397121', 'NCT03399370', 'NCT03400800', 'NCT03705234', 'NCT03814187', 'NCT04873934']);
         const isPhaseTwoLike = (phaseLabel = '') => {
             const p = String(phaseLabel ?? '').toLowerCase().trim();
             if (!p) return false;
@@ -2090,6 +2090,22 @@
                 publicationDate: '2026-03-05',
                 publicationSource: 'PubMed PMID:40211489',
                 notes: 'A publication abstract is available while the curated CT.gov record still shows no posted results.'
+            },
+            NCT05047263: {
+                label: 'FIND-CKD',
+                role: 'ghost_watchlist',
+                registeredPrimary: 'KidneyComp',
+                registeredPrimaryLabel: 'Kidney Composite (FIND-CKD specific)',
+                resultsPosted: false,
+                resultsFirstPosted: null,
+                completionDate: '2025-12-31',
+                ctgovLastUpdate: '2026-01-15',
+                protocolDocument: false,
+                sapDocument: false,
+                recordHistoryCaptured: false,
+                publicationDate: null,
+                publicationSource: null,
+                notes: 'Detected by living_update_scanner.py 2026-04-10. Bayer-sponsored, n=1584. Completed Dec 2025, results pending. PENDING manual extraction once results post or publication appears.'
             }
         };
 
@@ -2111,7 +2127,7 @@
 
             // ISSUE 10 FIX: Corrected ARTS-DN Metadata (Phase IIb)
             /* Known acronyms for trials whose CT.gov search may not return the acronym field */
-            nctAcronyms: { 'NCT03397121': 'ORION-9', 'NCT03399370': 'ORION-10', 'NCT03400800': 'ORION-11', 'NCT03705234': 'ORION-4' },
+            nctAcronyms: { 'NCT03397121': 'ORION-9', 'NCT03399370': 'ORION-10', 'NCT03400800': 'ORION-11', 'NCT03705234': 'ORION-4', 'NCT03814187': 'ORION-8', 'NCT04873934': 'V-INCEPTION' },
             _allowedSources: new Set(['registry', 'pubmed', 'openalex', 'reference', 'manual']),
             _allowedStatuses: new Set(['search', 'include', 'exclude']),
             sanitizeText(value, maxLen = 600) {
@@ -2501,6 +2517,26 @@
                     evidence: [
                         { label: 'Trial Design', source: 'ClinicalTrials.gov NCT03705234', text: 'Double-blind RCT of 16,124 patients with ASCVD randomized 1:1 to inclisiran 300 mg SC or placebo every 6 months. Primary endpoint: MACE (CHD death, MI, ischemic stroke, urgent revascularization). Planned median follow-up ~5 years. Primary completion Oct 2026.', highlights: ['16,124', 'MACE', '5 years', 'Oct 2026'] },
                         { label: 'Significance for Living MA', source: 'Protocol analysis', text: 'ORION-4 will be the definitive cardiovascular outcomes trial for inclisiran. It is the largest inclisiran trial by enrollment (16,124) and the only trial powered for MACE as a primary endpoint. Results expected 2026, will dramatically update this living MA.', highlights: ['definitive', '16,124', 'primary endpoint', '2026'] }
+                    ]
+                },
+                'NCT03814187': {
+                    name: 'ORION-8', phase: 'III', year: 2024,
+                    tE: 0, tN: 3275, cE: 0, cN: 0, group: 'Long-term extension (added 2026-04-10)',
+                    rob: ['low', 'low', 'low', 'low', 'low'],
+                    snippet: 'Source: ClinicalTrials.gov NCT03814187 (ORION-8). Long-term extension trial for ORION-9/10/11 inclisiran-treated patients. n=3,275. Status: COMPLETED Feb 2023, results posted. Detected via living_update_scanner. PENDING manual extraction.',
+                    sourceUrl: 'https://clinicaltrials.gov/study/NCT03814187',
+                    evidence: [
+                        { label: 'Living Scanner Detection', source: 'living_update_scanner.py 2026-04-10', text: 'Detected via CT.gov API v2 query. n=3,275 long-term extension. Primary completion 2023-02-13. Results posted to CT.gov. Provides 4-year LDL-C durability data complementing the original ORION-9/10/11 dataset.', highlights: ['3,275', 'long-term', 'results posted'] }
+                    ]
+                },
+                'NCT04873934': {
+                    name: 'V-INCEPTION', phase: 'III', year: 2024,
+                    tE: 0, tN: 400, cE: 0, cN: 0, group: 'Implementation/usual-care (added 2026-04-10)',
+                    rob: ['low', 'low', 'low', 'some', 'low'],
+                    snippet: 'Source: ClinicalTrials.gov NCT04873934 (V-INCEPTION). Implementation effectiveness trial. n=400. Status: COMPLETED Aug 2024, results posted. Detected via living_update_scanner.',
+                    sourceUrl: 'https://clinicaltrials.gov/study/NCT04873934',
+                    evidence: [
+                        { label: 'Living Scanner Detection', source: 'living_update_scanner.py 2026-04-10', text: 'Implementation effectiveness trial of inclisiran + usual care versus usual care alone. n=400 patients. Pragmatic design.', highlights: ['400', 'implementation', 'pragmatic'] }
                     ]
                 }
             },
@@ -12597,7 +12633,7 @@ print(res_sub)`;
                 ];
 
                 const recommendations = [];
-                if (ghostSignals > 0) recommendations.push({ level: 'warn', title: 'Maintain a ghost-result watchlist', text: 'Keep CONFIDENCE and FINE-ONE in a live rerun queue and refresh the delta table whenever CT.gov posts results.' });
+                if (ghostSignals > 0) recommendations.push({ level: 'warn', title: 'Maintain a ghost-result watchlist', text: 'Keep CONFIDENCE, FINE-ONE, and FIND-CKD in a live rerun queue and refresh the delta table whenever CT.gov posts results.' });
                 if (primaryEndpointDrift > 0 || confirmedPrimaryDrift > 0) recommendations.push({ level: 'info', title: 'Declare endpoint bridging explicitly', text: 'Name every analyzed non-primary endpoint bridge and separate structural CT.gov primary-outcome drift from wording-only registry updates in the manuscript methods, with the original registered primary kept visible in the table.' });
                 if (abstractOnly > 0 || approximateOrDerived > 0) recommendations.push({ level: 'warn', title: 'Flag non-registry derivations', text: 'Any abstract-only, approximate, or derived endpoint counts should remain labeled in the evidence ledger and sensitivity narrative.' });
                 if (historyLocked < tracked) recommendations.push({ level: 'warn', title: 'Harvest CT.gov version history', text: 'Run `python ctgov_history_harvest.py` for the inclisiran watchlist, then import the generated history pack before claiming true protocol drift.' });
